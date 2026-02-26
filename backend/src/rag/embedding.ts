@@ -12,7 +12,7 @@ export const generateEmbedding = async (
   const response = await cohere.embed({
     model: "embed-english-v3.0",
     texts: [text],
-    inputType: type   // ✅ correct for your SDK
+    inputType: type  
   });
 
   return (response.embeddings as number[][])[0];

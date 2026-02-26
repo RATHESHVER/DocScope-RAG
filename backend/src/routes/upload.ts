@@ -27,10 +27,8 @@ router.post("/", upload.single("file"), async (req, res) => {
       text = req.file.buffer.toString();
     }
 
-    // ⭐ CLEAN TEXT
     text = text.replace(/\r\n/g, "\n").trim();
 
-    // ⭐ REAL CHUNKING LOGIC (THIS WAS MISSING)
     const CHUNK_SIZE = 500;
     const OVERLAP = 50;
 
@@ -43,7 +41,6 @@ router.post("/", upload.single("file"), async (req, res) => {
       }
     }
 
-    // ⭐ GENERATE EMBEDDINGS
     const vectors = [];
 
     for (const chunk of chunks) {

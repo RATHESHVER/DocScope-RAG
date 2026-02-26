@@ -16,7 +16,6 @@ router.post("/", async (req, res) => {
 
     const sessionId = req.headers.sessionid as string;
 
-    // ⭐ READ RAW VALUES (NO DEFAULT FALLBACK HERE)
     const question: string = req.body.question;
     const topK: number = Number(req.body.topK);
     const threshold: number = Number(req.body.threshold);
@@ -44,10 +43,8 @@ router.post("/", async (req, res) => {
       score: cosineSimilarity(queryEmbedding, v.embedding)
     }));
 
-    // ⭐ ALWAYS SORT FIRST
     const sorted = scored.sort((a,b)=>b.score-a.score);
 
-    // ⭐ ALWAYS TAKE TOPK FIRST
     const retrieved = sorted.slice(0, topK);
 
     console.log("Retrieved count:", retrieved.length);
