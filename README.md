@@ -37,7 +37,6 @@ The system prevents hallucination using threshold-based retrieval and prompt-lev
 
 ### **Frontend**
 - Next.js (App Router)
-- React
 - TypeScript
 - Tailwind CSS
 
