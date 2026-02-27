@@ -86,7 +86,6 @@ export default function Home() {
   };
 
   const uploadFile = async (selected?: File) => {
-
     const target = selected || file;
     if (!target) return;
 
@@ -156,7 +155,6 @@ export default function Home() {
         }
       `}</style>
 
-      {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-blue-400 flex gap-2 items-center">
@@ -172,11 +170,9 @@ export default function Home() {
         </span>
       </div>
 
-      {/* GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* SESSION */}
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)] hover:scale-[1.01] transition">
+        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
 
           <h2 className="text-blue-400 font-semibold mb-3">🧾 Session</h2>
 
@@ -211,8 +207,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* UPLOAD */}
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)] hover:scale-[1.01] transition">
+        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
           <h2 className="text-blue-400 font-semibold mb-3">📂 Upload</h2>
 
           <div
@@ -243,8 +238,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* ASK */}
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)] hover:scale-[1.01] transition">
+        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
           <h2 className="text-blue-400 font-semibold mb-3">❓ Ask Question</h2>
 
           <textarea
@@ -262,22 +256,27 @@ export default function Home() {
         </div>
       </div>
 
-      {/* CHAT + SETTINGS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div className="lg:col-span-2 bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)] max-h-[420px] overflow-y-auto">
           <h2 className="text-blue-400 font-semibold mb-3">💬 Chat</h2>
 
-          {chatHistory.map((msg,index)=>(
-            <div key={index}
-              className={`p-3 rounded-lg text-sm mb-2 animate-[fadeIn_0.25s_ease] ${
-                msg.role==="user"
-                ? "bg-blue-600 ml-auto max-w-[70%]"
-                : "bg-gray-700 max-w-[70%]"
-              }`}>
-              {msg.content}
+          {chatHistory.length === 0 ? (
+            <div className="text-gray-500 text-sm text-center mt-10">
+              Upload a document and ask a question to begin.
             </div>
-          ))}
+          ) : (
+            chatHistory.map((msg,index)=>(
+              <div key={index}
+                className={`p-3 rounded-lg text-sm mb-2 animate-[fadeIn_0.25s_ease] ${
+                  msg.role==="user"
+                  ? "bg-blue-600 ml-auto max-w-[70%]"
+                  : "bg-gray-700 max-w-[70%]"
+                }`}>
+                {msg.content}
+              </div>
+            ))
+          )}
         </div>
 
         <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
@@ -305,36 +304,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* RETRIEVAL INFO */}
-      <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-        <h2 className="text-blue-400 font-semibold mb-3">🔍 Retrieval Info</h2>
-
-        <div className="text-sm space-y-1 text-gray-300">
-          <p>TopK Used: <span className="text-blue-400">{topK}</span></p>
-          <p>Threshold Used: <span className="text-blue-400">{threshold.toFixed(2)}</span></p>
-          <p>Total Chunks Stored: <span className="text-blue-400">{chunks}</span></p>
-          <p>Chunks Retrieved: <span className="text-blue-400">{lastRetrievedCount}</span></p>
-          {responseTime !== null && (
-            <p>Response Time: <span className="text-green-400">{responseTime} ms</span></p>
-          )}
-        </div>
-      </div>
-
-      {/* RETRIEVED CHUNKS */}
-      {retrieved.length>0 && (
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-          <h2 className="text-blue-400 font-semibold mb-3">🧠 Retrieved Chunks</h2>
-
-          {retrieved.map((r,i)=>(
-            <div key={i} className="bg-gray-800 p-3 rounded mb-2 text-sm">
-              {r.text}
-              <p className="text-xs text-gray-400 mt-1">
-                Similarity: {r.score.toFixed(3)}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
     </main>
   );
 }
