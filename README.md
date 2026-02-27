@@ -125,6 +125,12 @@ http://localhost:3000
 
 ---
 
+## **Architecture Diagram**
+
+![Architecture Diagram](./assets/architecture.jpeg)
+
+---
+
 ## **Chunking Strategy**
 
 Text is split into chunks using:
@@ -231,7 +237,6 @@ Vector storage is implemented as an in-memory store (as required).
 
 ### Frontend
 - next — Framework
-- react — UI rendering
 - tailwindcss — Styling
 
 ---
@@ -252,12 +257,6 @@ Vector storage is implemented as an in-memory store (as required).
 - Pre-normalize embeddings for optimized similarity
 - Add persistent storage layer
 - Implement token-length management
-
----
-
-## **Architecture Diagram**
-
-![Architecture Diagram](./assets/architecture.jpeg)
 
 ---
 
