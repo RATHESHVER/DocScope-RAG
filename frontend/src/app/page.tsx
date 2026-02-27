@@ -13,7 +13,6 @@ interface RetrievedChunk {
 }
 
 export default function Home() {
-
   const [sessionId, setSessionId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState(Date.now());
@@ -34,6 +33,7 @@ export default function Home() {
 
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [lastRetrievedCount, setLastRetrievedCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     createSession();
@@ -67,6 +67,8 @@ export default function Home() {
     setUploadedDoc("");
     setUploadMsg("");
     setFileKey(Date.now());
+    setLastRetrievedCount(0);
+    setResponseTime(null);
   };
 
   const clearSession = async () => {
@@ -83,6 +85,8 @@ export default function Home() {
     setUploadedDoc("");
     setUploadMsg("");
     setFileKey(Date.now());
+    setLastRetrievedCount(0);
+    setResponseTime(null);
   };
 
   const uploadFile = async (selected?: File) => {
@@ -114,9 +118,9 @@ export default function Home() {
   };
 
   const askQuestion = async () => {
+    if (!question.trim() || chunks === 0) return;
 
-    if (!question.trim()) return;
-
+    setLoading(true);
     const start = Date.now();
 
     const res = await fetch("http://localhost:5000/chat", {
@@ -129,7 +133,6 @@ export default function Home() {
     });
 
     const data = await res.json();
-
     const end = Date.now();
 
     setResponseTime(end - start);
@@ -143,18 +146,13 @@ export default function Home() {
 
     setRetrieved(data.retrieved || []);
     setQuestion("");
+    setLoading(false);
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0b1220] to-[#020617] text-gray-200 p-6 flex flex-col gap-6">
 
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
+      {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-blue-400 flex gap-2 items-center">
@@ -165,16 +163,27 @@ export default function Home() {
           </p>
         </div>
 
-        <span className="px-3 py-1 text-xs bg-green-600/20 text-green-400 rounded-full">
-          ● Active Session
-        </span>
+        {!sessionId ? (
+          <span className="px-3 py-1 text-xs bg-red-600/20 text-red-400 rounded-full">
+            ● No Session
+          </span>
+        ) : chunks === 0 ? (
+          <span className="px-3 py-1 text-xs bg-yellow-600/20 text-yellow-400 rounded-full">
+            ● Session Ready
+          </span>
+        ) : (
+          <span className="px-3 py-1 text-xs bg-green-600/20 text-green-400 rounded-full">
+            ● Live Session
+          </span>
+        )}
       </div>
 
+      {/* TOP GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-
-          <h2 className="text-blue-400 font-semibold mb-3">🧾 Session</h2>
+        {/* SESSION */}
+        <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+          <h2 className="text-blue-400 font-semibold mb-3">Session</h2>
 
           <p className="text-xs text-gray-500">Session ID</p>
           <p className="text-blue-400 text-xs break-all">{sessionId}</p>
@@ -199,7 +208,6 @@ export default function Home() {
               className="w-full bg-red-600 hover:bg-red-700 py-2 rounded">
               Clear
             </button>
-
             <button onClick={newSession}
               className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded">
               New
@@ -207,8 +215,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-          <h2 className="text-blue-400 font-semibold mb-3">📂 Upload</h2>
+        {/* UPLOAD */}
+        <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+          <h2 className="text-blue-400 font-semibold mb-3">Upload</h2>
 
           <div
             onDragOver={(e)=>e.preventDefault()}
@@ -238,8 +247,9 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-          <h2 className="text-blue-400 font-semibold mb-3">❓ Ask Question</h2>
+        {/* ASK */}
+        <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+          <h2 className="text-blue-400 font-semibold mb-3">Ask Question</h2>
 
           <textarea
             value={question}
@@ -249,17 +259,29 @@ export default function Home() {
 
           <button
             onClick={askQuestion}
-            className="bg-blue-600 hover:bg-blue-700 py-2 rounded mt-3 w-full"
+            disabled={chunks === 0}
+            className={`py-2 rounded mt-3 w-full ${
+              chunks === 0
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Ask
           </button>
         </div>
       </div>
 
+      {/* CHAT + SETTINGS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div className="lg:col-span-2 bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)] max-h-[420px] overflow-y-auto">
-          <h2 className="text-blue-400 font-semibold mb-3">💬 Chat</h2>
+        <div className="lg:col-span-2 bg-[#111827]/70 border border-gray-700 rounded-xl p-5 max-h-[420px] overflow-y-auto">
+          <h2 className="text-blue-400 font-semibold mb-3">Chat</h2>
+
+          {loading && (
+            <div className="text-gray-400 text-sm mb-3">
+              Thinking...
+            </div>
+          )}
 
           {chatHistory.length === 0 ? (
             <div className="text-gray-500 text-sm text-center mt-10">
@@ -268,7 +290,7 @@ export default function Home() {
           ) : (
             chatHistory.map((msg,index)=>(
               <div key={index}
-                className={`p-3 rounded-lg text-sm mb-2 animate-[fadeIn_0.25s_ease] ${
+                className={`p-3 rounded-lg text-sm mb-2 ${
                   msg.role==="user"
                   ? "bg-blue-600 ml-auto max-w-[70%]"
                   : "bg-gray-700 max-w-[70%]"
@@ -279,8 +301,8 @@ export default function Home() {
           )}
         </div>
 
-        <div className="bg-[#111827]/70 backdrop-blur border border-gray-700/70 rounded-xl p-5 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
-          <h2 className="text-blue-400 font-semibold mb-3">⚙️ Retrieval Settings</h2>
+        <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+          <h2 className="text-blue-400 font-semibold mb-3">Retrieval Settings</h2>
 
           <p>Top K: {topK}</p>
           <input type="range" min="1" max="5"
@@ -304,6 +326,35 @@ export default function Home() {
         </div>
       </div>
 
+      {/* RETRIEVAL INFO */}
+      <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+        <h2 className="text-blue-400 font-semibold mb-3">Retrieval Info</h2>
+
+        <div className="text-sm space-y-1">
+          <p>TopK Used: {topK}</p>
+          <p>Threshold Used: {threshold.toFixed(2)}</p>
+          <p>Total Chunks Stored: {chunks}</p>
+          <p>Chunks Retrieved: {chunks === 0 ? 0 : lastRetrievedCount}</p>
+          {responseTime !== null && chunks !== 0 && (
+            <p>Response Time: {responseTime} ms</p>
+          )}
+        </div>
+      </div>
+
+      {retrieved.length > 0 && (
+        <div className="bg-[#111827]/70 border border-gray-700 rounded-xl p-5">
+          <h2 className="text-blue-400 font-semibold mb-3">Retrieved Chunks</h2>
+
+          {retrieved.map((r,i)=>(
+            <div key={i} className="bg-gray-800 p-3 rounded mb-2 text-sm">
+              {r.text}
+              <p className="text-xs text-gray-400 mt-1">
+                Similarity: {r.score.toFixed(3)}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
