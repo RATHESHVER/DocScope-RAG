@@ -41,8 +41,8 @@ The system prevents hallucination using threshold-based retrieval and prompt-lev
 - Tailwind CSS
 
 ### **Backend**
-- Node.js
-- Express.js
+- Node.js (Runtime)
+- Express.js (Frame Work)
 - TypeScript
 
 ### **AI / Embeddings**
